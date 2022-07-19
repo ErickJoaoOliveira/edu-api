@@ -9,7 +9,10 @@ const LessonsController = require('./controllers/LessonsController');
 
 routes.get('/', IndexController.index);
 
+// Rotas de Cursos
 routes.post('/courses', CoursesController.create);
+routes.get('/courses',CoursesController.find);
+
 
 routes.post('/instructors', InstructorsController.create);
 

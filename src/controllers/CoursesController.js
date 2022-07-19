@@ -1,6 +1,17 @@
 const knex = require('../databases/knex');
 const fieldValidator = require('../utils/FieldValidator');
 
+exports.find = async (req, res) =>{
+  try{
+    const courses = await knex.select('*').from('courses'); 
+
+    return res.status(200).send(courses);
+    
+  }catch{
+    return res.status(500).send({error: exports.message || e});
+  }
+}
+
 exports.create = async (req, res) => {
   try {
     const course = req.body;
