@@ -50,6 +50,7 @@ exports.findById = async (req, res) => {
     };
 
     const lessons = await knex.select('*').from('lessons').where({courseId: id});
+
     return res.status(200).send({...course, lessons});
   } catch (e) {
     return res.status(500).send({ error: e.message || e });

@@ -77,3 +77,14 @@ exports.create = async (req, res) => {
     return res.status(500).send({ error: e.message || e });
   }
 }
+
+exports.getById = async (req, res) => {
+  try{
+  const id = req.params.id;
+  const lessons = await knex.select('*').from('lessons').where({id}).first();
+
+  const instructors = await knex.select('*').from('instructors').where({id}).first();
+
+  return res.status(200).send({...lessons, instructors});
+  } catch (e) {}
+}
