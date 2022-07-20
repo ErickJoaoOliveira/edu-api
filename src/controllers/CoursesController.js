@@ -56,3 +56,38 @@ exports.findById = async (req, res) => {
     return res.status(500).send({ error: e.message || e });
   }
 }
+
+exports.update = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const newCourse = req.body;
+    const course = await knex.select('*').from('courses').where({id}).first();
+
+    if(!course) {
+      return res.status(404).send({
+        status: `Nenhum curso com o id ${id} foi encontrado`
+      })
+    }
+
+    await knex.update(newCourse).from('courses').where({id});
+    const courseUpdated = await knex.select('*').from('courses').where({id}).first();
+    return res.status(200).send(courseUpdated)
+  } catch (e) {
+    return res.status(500).send({ error: e?.message || e });
+  }
+}
+
+exports.delete = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const [course] = await knex.select('*').from('courses').where({id}).first(); 
+
+    if(!course) {
+      return res.status(404).send(`A aula com id: ${id} não existe`);
+    }
+    await knex.delete({title: course.title}).from('courses').where({id: course.id});
+    return res.status(200).send({ status:'Aula deletada com sucesso', data: course});
+  } catch (e) {
+    return res.status(500).send({ error: e?.message || e });
+  }
+};

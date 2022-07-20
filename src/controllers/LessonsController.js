@@ -79,6 +79,17 @@ exports.create = async (req, res) => {
   }
 }
 
+exports.find = async (req, res) =>{
+  try{
+    const lesson = await knex.select('*').from('lessons'); 
+
+    return res.status(200).npmsend(lesson);
+
+  }catch (e){
+    return res.status(500).send({error: exports.message || e});
+  }
+}
+
 exports.getById = async (req, res) => {
   try {
     const id = req.params.id;
@@ -106,3 +117,38 @@ exports.getById = async (req, res) => {
     return res.status(500).send({ error: e?.message || e });
   }
 }
+
+exports.update = async (req,res) => {
+  try {
+      const {id} = req.params;
+      const newLesson = req.body;
+      const lesson = await knex.select('*').from('lessons').where({id}).first();
+
+      if(!lesson){
+        return res.status(404).send({status: `A aula com o ID: ${id} não foi encontrada`})
+      }
+
+    await knex.update(newLesson).from('lessons').where({id});
+    const lessonUpdated = await knex.select('*').from('lessons').where({id}).first();
+
+    return res.status(200).send(lessonUpdated)
+
+  } catch (e) {
+    return res.status(500).send({ error: e?.message || e });
+  }
+}
+
+exports.delete = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const [lesson] = await knex.select('*').from('lessons').where({id}).first(); 
+
+    if(!lesson) {
+      return res.status(404).send(`A aula com id: ${id} não existe`);
+    }
+    await knex.delete({title: lesson.title}).from('lessons').where({id: lesson.id});
+    return res.status(200).send({ status:'Aula deletada com sucesso', data: lesson});
+  } catch (e) {
+    return res.status(500).send({ error: e?.message || e });
+  }
+};
