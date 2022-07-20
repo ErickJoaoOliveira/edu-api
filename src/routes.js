@@ -12,7 +12,7 @@ routes.get('/', IndexController.index);
 // Rotas de Cursos
 routes.post('/courses', CoursesController.create);
 routes.get('/courses',CoursesController.find);
-
+routes.get('/courses/:id', CoursesController.findById);
 
 routes.post('/instructors', InstructorsController.create);
 
