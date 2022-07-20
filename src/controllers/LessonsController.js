@@ -2,6 +2,7 @@ const knex = require('../databases/knex');
 const fieldValidator = require('../utils/FieldValidator');
 
 exports.create = async (req, res) => {
+  
   try {
     const invalidFields = fieldValidator(
       req.body, ['title', 'description', 'videoId', 'instructorId', 'courseId']
@@ -79,12 +80,29 @@ exports.create = async (req, res) => {
 }
 
 exports.getById = async (req, res) => {
-  try{
-  const id = req.params.id;
-  const lessons = await knex.select('*').from('lessons').where({id}).first();
+  try {
+    const id = req.params.id;
+    const lesson = await knex.select('*').from('lessons').where({id}).first();
+    if(!lesson) {
+      return res.status(404).send({ status: `Aula com id ${id} não foi encontrada` });
+    }
 
-  const instructors = await knex.select('*').from('instructors').where({id}).first();
+    const [instructor] = await knex.select('*').from('instructors').where({id: lesson.instructorId});
+    lesson.instructor = instructor.fullName;
 
-  return res.status(200).send({...lessons, instructors});
-  } catch (e) {}
+    delete lesson.instructorId;
+    delete lesson.courseId;
+    delete instructor.id;
+
+    if(!instructor.avatarUrl){
+      instructor.avatarUrl = 'https://avatars.dicebear.com/api/bottts/your-custom-seed.svg'
+    }
+
+    return res.status(200).send({
+      ...lesson,
+      instructor
+    });
+  } catch (e) {
+    return res.status(500).send({ error: e?.message || e });
+  }
 }
