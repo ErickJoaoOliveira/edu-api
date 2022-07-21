@@ -92,7 +92,7 @@ exports.find = async (req, res) =>{
 
 exports.getById = async (req, res) => {
   try {
-    const id = req.params.id;
+    const {id} = req.params;
     const lesson = await knex.select('*').from('lessons').where({id}).first();
     if(!lesson) {
       return res.status(404).send({ status: `Aula com id ${id} não foi encontrada` });
@@ -147,7 +147,7 @@ exports.delete = async (req, res) => {
       return res.status(404).send(`A aula com id: ${id} não existe`);
     }
     await knex.delete({title: lesson.title}).from('lessons').where({id: lesson.id});
-    return res.status(200).send({ status:'Aula deletada com sucesso', data: lesson});
+    return res.status(204).send({ status:'Aula deletada com sucesso', data: lesson});
   } catch (e) {
     return res.status(500).send({ error: e?.message || e });
   }
